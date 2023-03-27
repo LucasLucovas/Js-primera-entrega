@@ -1,119 +1,79 @@
-let operandoa;
-let operandob;
-let operacion;
+const input = document.querySelector('.input-btn input');
+const listTasks = document.querySelector('.list-tasks ul');
+const message = document.querySelector('.list-tasks');
+let tasks = [];
 
-function init(){
-    let resultado = document.getElementById('resultado');
-    let reset = document.getElementById('reset');
-    let suma = document.getElementById('suma');
-    let resta = document.getElementById('resta');
-    let multiplicacion = document.getElementById('multiplicacion');
-    let division = document.getElementById('division');
-    let igual = document.getElementById('igual');
-    let uno = document.getElementById('uno');
-    let dos = document.getElementById('dos');
-    let tres = document.getElementById('tres');
-    let cuatro = document.getElementById('cuatro');
-    let cinco = document.getElementById('cinco');
-    let seis = document.getElementById('seis');
-    let siete = document.getElementById('siete');
-    let ocho = document.getElementById('ocho');
-    let nueve = document.getElementById('nueve');
-    let cero = document.getElementById('cero');
-  }
+eventListeners();
+function eventListeners(){
+    document.addEventListener('DOMContentLoaded', () => {
+        tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        createHTML();
+    });
 
-
-
-  //Eventos de click
-uno.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "1";
-}
-dos.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "2";
-}
-tres.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "3";
-}
-cuatro.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "4";
-}
-cinco.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "5";
-}
-seis.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "6";
-}
-siete.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "7";
-}
-ocho.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "8";
-}
-nueve.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "9";
-}
-cero.onclick = function(e){
-    resultado.innerHTML = resultado.innerHTML  + "0";
-}
-reset.onclick = function(e){
-    resetear();
-}
-suma.onclick = function(e){
-    operandoa = resultado.innerHTML;
-    operacion = "+";
-    limpiar();
-}
-resta.onclick = function(e){
-    operandoa = resultado.innerHTML;
-    operacion = "-";
-    limpiar();
-}
-multiplicacion.onclick = function(e){
-    operandoa = resultado.innerHTML;
-    operacion = "*";
-    limpiar();
-}
-division.onclick = function(e){
-    operandoa = resultado.innerHTML;
-    operacion = "/";
-    limpiar();
-}
-igual.onclick = function(e){
-    operandob = resultado.innerHTML;
-    resolver();
+    listTasks.addEventListener('click', deleteTask);
 }
 
-function limpiar(){
-    resultado.innerHTML = "";
-  }
-  
-  function resetear(){
-    resultado.innerHTML = "";
-    operandoa = 0;
-    operandob = 0;
-    operacion = "";
-  }
-
-
-  function resolver(){
-    var res = 0;
-    switch(operacion){
-      case "+":
-        res = parseFloat(operandoa) + parseFloat(operandob);
-        break;
-  
-      case "-":
-          res = parseFloat(operandoa) - parseFloat(operandob);
-          break;
-  
-      case "*":
-        res = parseFloat(operandoa) * parseFloat(operandob);
-        break;
-  
-      case "/":
-        res = parseFloat(operandoa) / parseFloat(operandob);
-        break;
+function deleteTask(e){
+    if (e.target.tagName == 'SPAN') {
+        const deleteId = parseInt(e.target.getAttribute('task-id'));
+        tasks = tasks.filter(task => task.id !== deleteId);
+        createHTML();
     }
-    resetear();
-    resultado.innerHTML = res;
-  }
+}
+
+function deleteAll(){
+    tasks = [];
+    createHTML();
+}
+
+function addTasks(){
+    const task = input.value;
+    if (task === '') {
+        showError('The field is empty...');
+        return;
+    }
+
+    const taskObj = {
+        task,
+        id: Date.now()
+    }
+    tasks = [...tasks, taskObj]
+
+    createHTML();
+    input.value = '';
+}
+
+function createHTML(){
+    clearHTML();
+
+    if (tasks.length > 0) {
+        tasks.forEach(task => {
+            const li = document.createElement('li');
+            li.innerHTML = `${task.task} <span task-id="${task.id}" >X</span>`;
+
+            listTasks.appendChild(li);
+        });
+    }
+
+    sincronizationStorage();
+}
+
+function sincronizationStorage(){
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function showError(error){
+    const messageError = document.createElement('p');
+    messageError.textContent = error;
+    messageError.classList.add('error');
+
+    message.appendChild(messageError);
+    setTimeout(() => {
+        messageError.remove();
+    },2000);
+
+}
+
+function clearHTML(){
+    listTasks.innerHTML = '';
+}
