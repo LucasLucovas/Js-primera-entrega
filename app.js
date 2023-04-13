@@ -1,5 +1,7 @@
 import axios from "axios";
  
+const buttonAddTask = document.getElementById("AddTask")
+const buttonRemoveTask = document.getElementById("RemoveTask")
 const input = document.querySelector('.input-btn input');
 const listTasks = document.querySelector('.list-tasks ul');
 const message = document.querySelector('.list-tasks');
@@ -14,6 +16,9 @@ function eventListeners(){
 
     listTasks.addEventListener('click', deleteTask);
 }
+
+buttonAddTask.addEventListener('click', addTasks)
+buttonRemoveTask.addEventListener('click', deleteAll)
 
 function deleteTask(e){
     if (e.target.tagName == 'SPAN') {
